@@ -59,4 +59,10 @@
         ORDER BY regdate DESC
         LIMIT #{page}, 2
     </select>
+
+    <update id="updateReviewCntAndStarRate">
+        UPDATE store
+        SET review_count = review_count + 1, start_rating = start_rating + #{start_rating}
+        WHERE id=#{id}
+    </update>
 </mapper>

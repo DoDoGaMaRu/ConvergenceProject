@@ -52,4 +52,9 @@ public class UserDTO extends DTO {
     public Authority getAuthorityEnum() {
         return authority;
     }
+
+    @Override
+    public String toString() {
+        return name + ", " + phone + ", " + id + ", " + pw;
+    }
 }

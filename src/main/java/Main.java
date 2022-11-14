@@ -26,8 +26,7 @@ public class Main {
 
     static StoreView storeView = new StoreView();
     static OrdersView ordersView = new OrdersView();
-
-    static UserService userService = new UserService(userDAO, menuDAO, ordersDAO, ordersView);
+    static UserService userService = new UserService(userDAO, menuDAO, ordersDAO, ordersView, reviewDAO);
     static OwnerService ownerService = new OwnerService(userDAO, storeRegistDAO, menuDAO, ordersDAO, ordersView);
     static AdminService adminService = new AdminService(storeRegistDAO, storeDAO, userDAO, storeView);
 
@@ -240,14 +239,28 @@ public class Main {
         deliveryFinish(orders.get(2).getId());
 
         // 이거 test3_4 랑 같은 기능은 아닌데 머지? 고객이 배달중인 주문을 조회 못하는데 취소 우예함?
+
     }
 
     public static void deliveryFinish(Long order_id) {
         ownerService.completeOrder(order_id);
     }
 
-    public static void writeReview() {
+    public static void test4_1() {
+        /* 고객 정보 가져오기 */
+        UserDTO user = userDAO.selectOneWithId("");
 
+        /* 고객의 주문 정보 가져오기 */
+        List<OrdersDTO> orders = ordersDAO.selectAllWithUser_pk(user.getPk());
+
+        /* 리뷰 등록 */
+        writeReview("맛은 있는데 양이 적네요", LocalDateTime.now(), 3, user.getPk(), orders.get(0).getId());
+        writeReview("Good", LocalDateTime.now(), 3, user.getPk(), orders.get(1).getId());
+        writeReview("Bad", LocalDateTime.now(), 3, user.getPk(), orders.get(2).getId());
+    }
+
+    public static void writeReview(String comment, LocalDateTime localDateTime, Integer star_rating, Long user_pk, Long orders_id) {
+        userService.insertReview(comment, localDateTime, star_rating, user_pk, orders_id);
     }
 
     public static void viewReview() {

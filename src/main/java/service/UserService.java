@@ -2,25 +2,29 @@ package service;
 
 import persistence.dao.MenuDAO;
 import persistence.dao.OrdersDAO;
+import persistence.dao.ReviewDAO;
 import persistence.dto.OrdersDTO;
 import persistence.dao.UserDAO;
 import persistence.enums.Authority;
 import persistence.enums.OrdersStatus;
 import view.OrdersView;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class UserService {
     private UserDAO userDAO;
     private MenuDAO menuDAO;
     private OrdersDAO ordersDAO;
+    private ReviewDAO reviewDAO;
     OrdersView ordersView;
 
-    public UserService(UserDAO userDAO, MenuDAO menuDAO, OrdersDAO ordersDAO, OrdersView ordersView) {
+    public UserService(UserDAO userDAO, MenuDAO menuDAO, OrdersDAO ordersDAO, OrdersView ordersView, ReviewDAO reviewDAO) {
         this.userDAO = userDAO;
         this.menuDAO = menuDAO;
         this.ordersDAO = ordersDAO;
         this.ordersView = ordersView;
+        this.reviewDAO = reviewDAO;
     }
 
     public Long insertUser(String id, String pw, String name, String phone, Integer age) {
@@ -47,5 +51,9 @@ public class UserService {
 
     public List<OrdersDTO> getOrdersList(Long user_pk) {
         return ordersDAO.selectAllWithUser_pk(user_pk);
+    }
+
+    public void insertReview(String comment, LocalDateTime localDateTime, Integer star_rating, Long user_pk, Long orders_id) {
+        reviewDAO.insertReview(comment, localDateTime, star_rating, user_pk, orders_id);
     }
 }

@@ -21,6 +21,12 @@
         VALUES (#{status}, #{regdate}, #{details}, #{price}, #{comment}, #{menu_id}, #{total_orders_id}, #{store_id})
     </insert>
 
+    <update id="updateForInsert">
+        UPDATE menu
+        SET stock = stock - 1
+        WHERE menu_id=#{menu_id}
+    </update>
+
     <select id="selectAllWithStore_id" resultMap="result">
         SELECT *
         FROM orders

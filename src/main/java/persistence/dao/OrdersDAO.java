@@ -24,8 +24,14 @@ public class OrdersDAO extends DAO<OrdersDTO> {
         return session.selectOne(sqlMapperPath + arg[0], arg[1]);
     }
     @Override
-    protected int insert(SqlSession session, Object[] arg) {
-        return session.insert(sqlMapperPath + arg[0], arg[1]);
+    protected int insert(SqlSession session, Object[] arg) throws Exception{
+        int sign = 0;
+        sign += session.insert(sqlMapperPath + arg[0], arg[1]);
+        sign += session.update(sqlMapperPath + "updateForInsert", arg[1]);
+        if (sign < 2) {
+            throw new Exception("Error");
+        }
+        return sign;
     }
     @Override
     protected int update(SqlSession session, Object[] arg) {

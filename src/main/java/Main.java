@@ -5,6 +5,7 @@ import persistence.enums.OrdersStatus;
 import service.AdminService;
 import service.OwnerService;
 import service.UserService;
+import view.OrdersView;
 import view.StoreView;
 
 import java.time.LocalDateTime;
@@ -24,9 +25,10 @@ public class Main {
     static ClassificationDAO classificationDAO = new ClassificationDAO(MyBatisConnectionFactory.getSqlSessionFactory());
 
     static StoreView storeView = new StoreView();
+    static OrdersView ordersView = new OrdersView();
 
-    static UserService userService = new UserService(userDAO);
-    static OwnerService ownerService = new OwnerService(userDAO, storeRegistDAO);
+    static UserService userService = new UserService(userDAO, menuDAO, ordersDAO, ordersView);
+    static OwnerService ownerService = new OwnerService(userDAO, storeRegistDAO, menuDAO, ordersDAO, ordersView);
     static AdminService adminService = new AdminService(storeRegistDAO, storeDAO, userDAO, storeView);
 
     public static void main(String[] args) {
@@ -39,15 +41,13 @@ public class Main {
         ownerService.insertStoreRegist("한솥도시락 금오공대점", "맛과 정성을 담았습니다", "054-472-0615","경북 구미시 대학로 39", ownerKey);
 
         /* 관리자 승인 및 가게 추가 */
-        var list = adminService.getHoldList();
+        List<StoreRegistDTO> list = adminService.getHoldList();
         StoreRegistDTO storeRegist = list.get(0);
         adminService.acceptStoreRegist(storeRegist.getId());
 
         /* 모든 가게 조회 */
         adminService.viewStoreList();
     }
-
-
 
     public static void test2_1() {
         /* 가게 들고 오기 */
@@ -119,23 +119,37 @@ public class Main {
         }
     }
 
+    public static void test2_3() {
+        /* 가게 들고 오기*/
+        UserDTO user = userDAO.selectOneWithId("honsot");
+        StoreDTO honsot = storeDAO.selectAllWithUser_pk(user.getPk()).get(0);
 
+        /* 매뉴 그룹 들고 오기 */
+        ClassificationDTO classification = classificationDAO.selectAllWithStore_id(honsot.getId()).get(0);
 
+        /* 수정할 메뉴 들고 오기 */
+        MenuDTO menu = menuDAO.selectAllWithClassification_id(classification.getId()).get(0);
 
-
-
+        /* 메뉴 수정 */
+        changeMenuNameAndPrice(menu.getId(), "돈까스고기고기", 6500);
+    }
 
     public static void changeMenuNameAndPrice(Long menu_id, String name, Integer price) {
-        MenuDTO menuDTO = menuDAO.selectOneWithId(menu_id);
-
-        System.out.println(menuDTO.getName() + "의 이름과 가격을 각각 " + name + "와" + " " + price + "원으로 수정");
-        menuDAO.updateNameAndPrice(menu_id, name, price);
-
-        System.out.println("(수정 후 조회)");
-
-        menuDTO = menuDAO.selectOneWithId(menu_id);
-        System.out.println(menuDTO.toString());
+        ownerService.updateMenu(menu_id, name, price);
     }
+
+    /*
+    public static void changeMenuNameAndPrice(Long menu_id, String name) {
+        ownerService.updateMenu(menu_id, name, null);
+    }
+    public static void changeMenuNameAndPrice(Long menu_id, Integer price) {
+        ownerService.updateMenu(menu_id, null, price);
+    }
+    public static void changeMenuNameAndPrice(Long menu_id) {
+        ownerService.updateMenu(menu_id, null, null);
+    }
+    */
+
 
     public static void test3_1() {
         Long user_pk = 1l;
@@ -162,24 +176,74 @@ public class Main {
         ordersDAO.insertOrders(LocalDateTime.now(), details, price, "무 많이요", menu.getId(), user_pk, store_id);
     }
 
-    public static void viewOrders(Long store_id) {
-        List<OrdersDTO> list = ordersDAO.selectAllWithStore_id(store_id);
+    public static void test3_2() {
+        /* 가게 들고 오기*/
+        UserDTO user = userDAO.selectOneWithId("honsot");
+        StoreDTO honsot = storeDAO.selectAllWithUser_pk(user.getPk()).get(0);
 
-        for (OrdersDTO o : list) {
-            System.out.println(o.toString());
-        }
+        /* 주문 조회 */
+        ownerService.viewOrdersList(honsot.getId());
+    }
+
+    public static void test3_3() {
+        /* 가게 들고 오기*/
+        UserDTO user = userDAO.selectOneWithId("honsot");
+        StoreDTO honsot = storeDAO.selectAllWithUser_pk(user.getPk()).get(0);
+
+        /* 해당 가게 주문 들고 오기 */
+        List<OrdersDTO> orders = ordersDAO.selectAllWithStore_id(honsot.getId());
+
+        /* 주문 승인 */
+        acceptOrders(orders.get(0).getId());
+        acceptOrders(orders.get(1).getId());
+        acceptOrders(orders.get(2).getId());
     }
 
     public static void acceptOrders(Long order_id) {
-        ordersDAO.updateStatus(OrdersStatus.IN_DELIVERY, order_id);
+        ownerService.acceptOrder(order_id);
+    }
+
+    public static void test3_4() {
+        /* 고객 들고 오기 */
+        UserDTO user = userDAO.selectOneWithId("");
+        UserDTO user2 = userDAO.selectOneWithId("");
+
+        /* 주문 들고 오기 */
+        List<OrdersDTO> orders = ordersDAO.selectAllWithStore_id(user.getPk());
+        List<OrdersDTO> orders2 = ordersDAO.selectAllWithStore_id(user2.getPk());
+
+        /* 주문 취소 */
+        acceptOrders(orders.get(0).getId());
+        acceptOrders(orders2.get(0).getId());
     }
 
     public static void cancelOrders(Long order_id) {
-        ordersDAO.updateStatus(OrdersStatus.CANCEL, order_id);
+        userService.cancelOrder(order_id);
+    }
+
+    public static void test3_5() {
+        // 재료소진
+        // stock 안 줄어 들어서 못 만들어여 ㅠㅜ
+    }
+
+    public static void test3_6() {
+        /* 가게 들고 오기*/
+        UserDTO user = userDAO.selectOneWithId("honsot");
+        StoreDTO honsot = storeDAO.selectAllWithUser_pk(user.getPk()).get(0);
+
+        /* 해당 가게 주문 들고 오기 */
+        List<OrdersDTO> orders = ordersDAO.selectAllWithStore_id(honsot.getId());
+
+        /* 배달 완료 처리 */
+        deliveryFinish(orders.get(0).getId());
+        deliveryFinish(orders.get(1).getId());
+        deliveryFinish(orders.get(2).getId());
+
+        // 이거 test3_4 랑 같은 기능은 아닌데 머지? 고객이 배달중인 주문을 조회 못하는데 취소 우예함?
     }
 
     public static void deliveryFinish(Long order_id) {
-        ordersDAO.updateStatus(OrdersStatus.COMPLETE, order_id);
+        ownerService.completeOrder(order_id);
     }
 
     public static void writeReview() {

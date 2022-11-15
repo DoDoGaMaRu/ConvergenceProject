@@ -59,7 +59,8 @@ public class ReviewDAO extends DAO<ReviewDTO> {
 
     public List<ReviewDTO> getReviewList(Long user_pk, int page) {
         String stmt = "getReviewList";
-        Map map = new HashMap<>();
+
+        Map map = new HashMap();
         map.put("user_pk", user_pk);
         map.put("page", page);
 

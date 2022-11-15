@@ -11,9 +11,14 @@ import view.StoreView;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 
 public class Main {
+    final static char START_PAGE = '1';
+    final static char END_PAGE = '2';
+    static Scanner sc = new Scanner(System.in);
+
     static StoreDAO storeDAO = new StoreDAO(MyBatisConnectionFactory.getSqlSessionFactory());
     static DetailsDAO detailsDAO = new DetailsDAO(MyBatisConnectionFactory.getSqlSessionFactory());
     static MenuDAO menuDAO = new MenuDAO(MyBatisConnectionFactory.getSqlSessionFactory());
@@ -30,7 +35,7 @@ public class Main {
     static StoreService storeService = new StoreService(storeDAO, classificationDAO, menuDAO, detailsDAO);
 
     public static void main(String[] args) {
-        System.out.println("test1");
+        /*System.out.println("test1");
         test1();
 
         System.out.println("\ntest2_1");
@@ -58,7 +63,10 @@ public class Main {
         test3_5();
 
         System.out.println("\ntest3_6");
-        test3_6();
+        test3_6();*/
+
+        //test4_1();
+        test4_2();
     }
 
     public static void test1() {
@@ -219,11 +227,21 @@ public class Main {
         System.out.println("[" + classification.getName() + "]");
         List<DetailsDTO> detailsList = storeService.getDetailsWithMenuId(menu.getId());
 
-        System.out.print(menu.getName() + " | " + menu.getPrice());
+        System.out.print(menu.getName() + " | " + menu.getPrice() + " | ");
         for (DetailsDTO details : detailsList) {
             System.out.print(", " + details.getName());
         }
         System.out.println();
+    }
+
+    public static void changeMenuNameAndPrice(Long menu_id, String name) {
+        changeMenuNameAndPrice(menu_id, name, null);
+    }
+    public static void changeMenuNameAndPrice(Long menu_id,  Integer price) {
+        changeMenuNameAndPrice(menu_id, null, price);
+    }
+    public static void changeMenuNameAndPrice(Long menu_id) {
+        changeMenuNameAndPrice(menu_id, null, null);
     }
 
 
@@ -348,12 +366,63 @@ public class Main {
 
 
 
-    public static void writeReview() {
+    public static void test4_1() {
+        UserDTO user = userService.getUserWithId("honsot");
+        List<OrdersDTO> list = userService.getEndedOrders(user.getPk());
 
+        writeReview("test1", 1, user.getPk(), list.get(0).getId());
+        writeReview("test2", 1, user.getPk(), list.get(1).getId());
+        writeReview("test3", 1, user.getPk(), list.get(2).getId());
+
+        /* 취소된 주문에는 리뷰 작성X 예시 */
+        UserDTO user2 = userService.getUserWithId("hello");
+        List<OrdersDTO> list2 = userService.getEndedOrders(user2.getPk());
+
+        writeReview("test4", 1, user2.getPk(), list2.get(0).getId());
     }
 
-    public static void viewReview() {
-        // 페이징 처리
+    public static void writeReview(String contents, Integer star_rating, Long user_pk, Long orders_id) {
+        userService.writeReview(contents, star_rating, user_pk, orders_id);
     }
 
+
+
+
+    public static void test4_2() {
+        UserDTO user = userService.getUserWithId("honsot");
+        char cmd = START_PAGE;
+
+        do {
+            viewReview(user.getPk(), cmd);
+            cmd = sc.next().charAt(0);
+            System.out.println();
+        } while(cmd != 'Q' && cmd != 'q');
+    }
+
+    public static void viewReview(Long user_pk, char page) {
+        int startCur = (int)(page - '0') * 2 - 2;
+
+        if(START_PAGE <= page && page <= END_PAGE) {
+            System.out.println("현재 " + page + " page 입니다.");
+            List<ReviewDTO> list = userService.getReviewList(user_pk, startCur);
+            view(list);
+        }
+        else {
+            System.out.println("없는 page 입니다. 다시 입력하세요.");
+            System.out.print("입력 : ");
+        }
+    }
+
+    public static void view(List<ReviewDTO> list) {
+        for(ReviewDTO review : list) {
+            System.out.println(review.getOrders_id() + ", " + review.getContents() + ", " + review.getRegdate());
+        }
+
+        System.out.print("Page ");
+        for(int i = START_PAGE - '0'; i <= END_PAGE - '0'; i++) {
+            System.out.print(i +" ");
+        }
+        System.out.print('\t' + "종료: q or Q" + '\n');
+        System.out.print("입력 : ");
+    }
 }

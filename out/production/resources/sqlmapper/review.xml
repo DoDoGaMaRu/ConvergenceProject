@@ -40,4 +40,12 @@
         SET review_count = review_count + 1, start_rating = start_rating + #{start_rating}
         WHERE id=#{id}
     </update>
+
+    <select id="getReviewList" parameterType="HashMap" resultMap="result">
+        SELECT *
+        FROM review
+        WHERE user_pk=#{user_pk}
+        ORDER BY regdate DESC
+        LIMIT #{page}, 2
+    </select>
 </mapper>

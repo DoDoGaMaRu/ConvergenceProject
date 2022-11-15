@@ -35,7 +35,7 @@ public class Main {
     static StoreService storeService = new StoreService(storeDAO, classificationDAO, menuDAO, detailsDAO);
 
     public static void main(String[] args) {
-        /*System.out.println("test1");
+        System.out.println("test1");
         test1();
 
         System.out.println("\ntest2_1");
@@ -63,9 +63,12 @@ public class Main {
         test3_5();
 
         System.out.println("\ntest3_6");
-        test3_6();*/
+        test3_6();
 
-        //test4_1();
+        System.out.println("\ntest4_1");
+        test4_1();
+
+        System.out.println("\ntest4_2");
         test4_2();
     }
 

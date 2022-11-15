@@ -51,4 +51,12 @@
         SET owner_comment=#{owner_comment}
         WHERE id=#{id}
     </update>
+
+    <select id="getReviewList" parameterType="HashMap" resultMap="result">
+        SELECT *
+        FROM review
+        WHERE user_pk=#{user_pk}
+        ORDER BY regdate DESC
+        LIMIT #{page}, 2
+    </select>
 </mapper>

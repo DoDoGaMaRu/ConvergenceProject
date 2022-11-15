@@ -77,4 +77,13 @@ public class ReviewDAO extends DAO<ReviewDTO> {
             return session.selectList(stmt, map);
         });
     }
+
+    public List<ReviewDTO> getReviewList(Long user_pk, int page) {
+        String stmt = "getReviewList";
+        Map map = new HashMap<>();
+        map.put("user_pk", user_pk);
+        map.put("page", page);
+
+        return selectList(stmt, map);
+    }
 }

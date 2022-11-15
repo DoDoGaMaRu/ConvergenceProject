@@ -7,7 +7,9 @@ import persistence.MyBatisConnectionFactory;
 import persistence.dto.ReviewDTO;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ReviewDAO extends DAO<ReviewDTO> {
     public ReviewDAO(SqlSessionFactory sqlSessionFactory){
@@ -53,5 +55,14 @@ public class ReviewDAO extends DAO<ReviewDTO> {
         reviewDTO.setUser_pk(user_pk);
 
         return selectList(stmt, reviewDTO);
+    }
+
+    public List<ReviewDTO> getReviewList(Long user_pk, int page) {
+        String stmt = "getReviewList";
+        Map map = new HashMap<>();
+        map.put("user_pk", user_pk);
+        map.put("page", page);
+
+        return selectList(stmt, map);
     }
 }

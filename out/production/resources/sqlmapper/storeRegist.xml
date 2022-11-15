@@ -5,13 +5,13 @@
 
 <mapper namespace="mapper.StoreRegistMapper">
     <resultMap id="result" type="StoreRegistDTO">
-        <result property="id" column="id"/> <!--PK, 자동 생성-->
+        <result property="id" column="id"/>
         <result property="name" column="name"/>
         <result property="comment" column="comment"/>
         <result property="address" column="address"/>
         <result property="phone" column="phone"/>
         <result property="status" column="status"/>
-        <result property="user_pk" column="user_pk"/> <!--FK-->
+        <result property="user_pk" column="user_pk"/>
     </resultMap>
 
     <insert id="insertRegistration">
@@ -28,6 +28,12 @@
         SELECT *
         FROM store_regist
         WHERE status=#{status}
+    </select>
+
+    <select id="selectOneWithId" resultMap="result">
+        SELECT *
+        FROM store_regist
+        WHERE id=#{id}
     </select>
 
     <update id="updateStatus">

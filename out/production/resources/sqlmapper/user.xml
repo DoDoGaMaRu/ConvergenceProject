@@ -5,7 +5,7 @@
 
 <mapper namespace="mapper.UserMapper">
     <resultMap id="result" type="UserDTO">
-        <result property="pk" column="pk"/> <!--PK, 자동 생성-->
+        <result property="pk" column="pk"/>
 
         <result property="id" column="id"/>
         <result property="pw" column="pw"/>
@@ -16,7 +16,7 @@
         <result property="authority" column="authority"/>
     </resultMap>
 
-    <insert id="insertUser">
+    <insert id="insertUser" useGeneratedKeys = "true" keyProperty="pk" keyColumn="pk">
         INSERT INTO user (authority, id, pw, name, phone, age)
         VALUES (#{authority}, #{id}, #{pw}, #{name}, #{phone}, #{age})
     </insert>

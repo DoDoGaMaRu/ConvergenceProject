@@ -392,6 +392,7 @@ public class Main {
 
 
     public static void test4_2() {
+        /* 페이징 크기 2의 의미를 잘 모르겠음 */
         UserDTO user = userService.getUserWithId("honsot");
         char cmd = START_PAGE;
 

@@ -71,4 +71,11 @@
         SET stock=#{stock}
         WHERE id=#{id}
     </update>
+
+    <select id="viewInformation">
+        SELECT menu_id AS id, name, COUNT(menu_id) AS stock, SUM(orders.price) AS price
+        FROM orders, menu
+        WHERE menu_id=#{menu_id} AND menu.id={menu_id}
+        GROUP BY menu_id;
+    </select>
 </mapper>

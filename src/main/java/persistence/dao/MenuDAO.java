@@ -115,4 +115,14 @@ public class MenuDAO extends DAO<MenuDTO>{
             return session.update(stmt, dto);
         });
     }
+
+    public MenuDTO viewInformation(Long id) {
+        String stmt = sqlMapperPath + "viewInformation";
+        MenuDTO dto = MenuDTO.builder()
+                .id(id).build();
+
+        return selectOne((SqlSession session) -> {
+            return session.selectOne(stmt, dto);
+        });
+    }
 }

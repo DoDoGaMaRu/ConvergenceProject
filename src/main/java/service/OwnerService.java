@@ -5,6 +5,7 @@ import persistence.dto.*;
 import persistence.enums.OrdersStatus;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 
 public class OwnerService {
@@ -14,6 +15,7 @@ public class OwnerService {
     private TotalOrdersDAO totalOrdersDAO;
     private OrdersDAO ordersDAO;
     private ReviewDAO reviewDAO;
+    private ClassificationDAO classificationDAO;
 
     public OwnerService(UserDAO userDAO, StoreDAO storeDAO, MenuDAO menuDAO, OrdersDAO ordersDAO) {
         this.userDAO = userDAO;
@@ -74,5 +76,19 @@ public class OwnerService {
         return reviewDAO.updateOwnerComment(review_id, comment);
     }
 
-    // TODO 1.7 통계정보
+    public void viewInformation(Long store_id) {
+        List<ClassificationDTO> groups = classificationDAO.selectAllWithStore_id(store_id);
+        List<MenuDTO> menus;
+        MenuDTO menu;
+
+        int idx = 1;
+        for (ClassificationDTO group : groups) {
+            menus = menuDAO.selectAllWithClassification_id(group.getId());
+
+            for(MenuDTO dto : menus) {
+                menu = menuDAO.viewInformation(dto.getId());
+                System.out.println(idx++ + ". " + menu.getName() + ", " + menu.getStock() + ", " + menu.getPrice());
+            }
+        }
+    }
 }
